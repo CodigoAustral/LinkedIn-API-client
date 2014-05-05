@@ -63,7 +63,13 @@ class UrlGenerator implements UrlGeneratorInterface
             // we cant run http_build_query($params, null, '&', PHP_QUERY_RFC3986); because it is not supported in php 5.3 or hhvm
             $url .= '?';
             foreach ($params as $key => $value) {
-                $url .= sprintf('%s=%s&', rawurlencode($key), rawurlencode($value));
+                if (!is_array($value)) {
+                    $url .= sprintf('%s=%s&', rawurlencode($key), rawurlencode($value));
+                    continue;
+                }
+                foreach ($value as $innerValue) {
+                    $url .= sprintf('%s=%s&', rawurlencode($key), rawurlencode($innerValue));
+                }
             }
             $url=rtrim($url, '&');
         }

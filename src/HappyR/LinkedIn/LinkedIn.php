@@ -109,12 +109,9 @@ class LinkedIn
         $this->urlGenerator = new UrlGenerator();
         $this->request = new Request();
 
-        // Use the Illuminate Session storage if it is available
-        if (class_exists('\Illuminate\Support\Facades\Session')) {
-            $this->storage = new IlluminateSessionStorage();
-        } else {
-            $this->storage = new SessionStorage();
-        }
+        $this->urlGenerator = new UrlGenerator();
+        $this->request = new Request();
+        $this->storage = new Session();
     }
 
     /**
@@ -251,7 +248,7 @@ class LinkedIn
             if ($user) {
                 $this->getStorage()->set('user', $user);
             } else {
-                $this->getStorage()->clearAll();
+                $this->clearStorage();
             }
         }
 
@@ -342,7 +339,7 @@ class LinkedIn
             }
 
             // code was bogus, so everything based on it should be invalidated.
-            $this->getStorage()->clearAll();
+            $this->clearStorage();
             throw new LinkedInApiException('Could not get access token');
         }
 
@@ -571,5 +568,13 @@ class LinkedIn
     public function getRequest()
     {
         return $this->request;
+    }
+
+    public function clearStorage() {
+        $storage = $this->getStorage();
+        $storage->clear('user');
+        $storage->clear('access_token');
+        $storage->clear('state');
+        $storage->clear('code');
     }
 }
